@@ -3,7 +3,7 @@ import pyaudio
 import numpy as np
 
 class AudioStreamWorker(QThread):
-    update_decibels = pyqtSignal(float)
+    update_audio_data = pyqtSignal(np.ndarray)
 
     def __init__(self):
         super().__init__()
@@ -19,9 +19,7 @@ class AudioStreamWorker(QThread):
         while self.running:
             data = stream.read(512, exception_on_overflow=False)
             data_int = np.frombuffer(data, dtype=np.int16)
-            rms = np.sqrt(np.mean(np.square(data_int)))
-            decibels = 20 * np.log10(rms) if rms > 0 else -np.inf
-            self.update_decibels.emit(decibels)
+            self.update_audio_data.emit(data_int)
 
         stream.stop_stream()
         stream.close()
