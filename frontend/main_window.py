@@ -4,31 +4,57 @@ import numpy as np
 import pyaudio
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QApplication, QPushButton, QHBoxLayout
-from PyQt5.QtCore import QTimer, Qt
-from monitor_selector import MonitorSelector
+from PyQt5.QtCore import QTimer, Qt, QThread, pyqtSignal
+
+from frontend.monitor_selector import MonitorSelector
+
+
+class AudioStreamWorker(QThread):
+    update_decibels = pyqtSignal(float)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def run(self):
+        p = pyaudio.PyAudio()
+        stream = p.open(format=pyaudio.paInt16,
+                        channels=1,
+                        rate=44100,
+                        input=True,
+                        frames_per_buffer=512)
+        while self.running:
+            data = stream.read(512, exception_on_overflow=False)
+            data_int = np.frombuffer(data, dtype=np.int16)
+            rms = np.sqrt(np.mean(np.square(data_int)))
+            decibels = 20 * np.log10(rms) if rms > 0 else -np.inf
+            self.update_decibels.emit(decibels)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+    def stop(self):
+        self.running = False
 
 class AudioVisualiser(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.muted = False
         self.decibels = 0
-        self.init_audio_stream()
         self.init_ui()
+        self.audio_thread = AudioStreamWorker()
+        self.audio_thread.update_decibels.connect(self.update_decibels)
+        self.audio_thread.start()
 
     def init_ui(self):
         self.setFixedSize(600, 100)
         self.setStyleSheet("background-color: black;")
 
-    def init_audio_stream(self):
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(format=pyaudio.paInt16,
-                                  channels=1,
-                                  rate=44100,
-                                  input=True,
-                                  frames_per_buffer=1024)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update)
-        self.timer.start(30)
+    def update_decibels(self, decibels):
+        if not self.muted:
+            self.decibels = decibels
+        self.repaint()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -46,18 +72,14 @@ class AudioVisualiser(QWidget):
             line_height = int((adjusted_decibels / 100) * height)
             painter.drawLine(0, height - line_height, width, height - line_height)
 
-    def update(self):
-        if not self.muted:
-            data = self.stream.read(1024, exception_on_overflow=False)
-            data_int = np.frombuffer(data, dtype=np.int16)
-            rms = np.sqrt(np.mean(np.square(data_int)))
-            self.decibels = 20 * np.log10(rms) if rms > 0 else -np.inf
-        self.repaint()
-
-    def toggle_mute(self):
+    def toggle_mute(self, event):
         self.muted = not self.muted
         self.repaint()
 
+    def closeEvent(self, event):
+        self.audio_thread.stop()
+        self.audio_thread.wait()
+        event.accept()
 
 class MainWindow(QMainWindow):
     def __init__(self):
