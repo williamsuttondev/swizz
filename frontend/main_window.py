@@ -2,7 +2,7 @@ import mss
 import numpy as np
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayout
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QBuffer, QIODevice
 from monitor_selector import MonitorSelector
 from audio_visualiser import AudioVisualiser
 from output_window import OutputWindow
@@ -120,6 +120,14 @@ class MainWindow(QMainWindow):
                 qt_pixmap = QPixmap.fromImage(qt_img).scaled(self.monitor_preview.size(), Qt.KeepAspectRatio)
                 self.monitor_preview.setPixmap(qt_pixmap)
 
+                # Convert QImage to JPEG
+                buffer = QBuffer()
+                buffer.open(QIODevice.WriteOnly)
+                qt_img.save(buffer, "JPEG")
+                jpeg_data = buffer.data()
+                # Call backend function with JPEG data
+                #self.send_to_backend(jpeg_data)
+                
     def clear_layout(self, layout):
         while layout.count():
             child = layout.takeAt(0)
