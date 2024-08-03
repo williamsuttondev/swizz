@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_live_preview)
         self.output_window = None
+        self.audio_visualiser = None  # Initialize as None
 
     def init_ui(self):
         self.setWindowTitle("swizz")
@@ -75,6 +76,11 @@ class MainWindow(QMainWindow):
         self.audio_visualiser.mousePressEvent = self.audio_visualiser.toggle_mute
         self.layout.addWidget(self.audio_visualiser)
 
+        # Add extra spacing between the audio visualizer and the buttons
+        self.spacing_label = QLabel(self)
+        self.spacing_label.setFixedHeight(30)  # Adjust this value for desired spacing
+        self.layout.addWidget(self.spacing_label)
+
         # Open the output window
         self.output_window = OutputWindow()
         self.output_window.show()
@@ -91,6 +97,11 @@ class MainWindow(QMainWindow):
         self.audio_visualiser.setFixedSize(600, 100)
         self.audio_visualiser.mousePressEvent = self.audio_visualiser.toggle_mute
         self.layout.addWidget(self.audio_visualiser)
+
+        # Add extra spacing between the audio visualizer and the buttons
+        self.spacing_label = QLabel(self)
+        self.spacing_label.setFixedHeight(30)  # Adjust this value for desired spacing
+        self.layout.addWidget(self.spacing_label)
 
         # Open the output window
         self.output_window = OutputWindow()

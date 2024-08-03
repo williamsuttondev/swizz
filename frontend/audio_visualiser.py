@@ -1,5 +1,5 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import QTimer, pyqtSignal, Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 import numpy as np
 from audio_stream_worker import AudioStreamWorker
@@ -16,7 +16,7 @@ class AudioVisualiser(QWidget):
         self.audio_thread.start()
 
     def init_ui(self):
-        self.setFixedSize(600, 200)
+        self.setFixedSize(800, 100)
         self.setStyleSheet("background-color: black;")
 
     def update_audio_data(self, data):
