@@ -1,85 +1,10 @@
-import sys
 import mss
 import numpy as np
-import pyaudio
-from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QApplication, QPushButton, QHBoxLayout
-from PyQt5.QtCore import QTimer, Qt, QThread, pyqtSignal
-
-from frontend.monitor_selector import MonitorSelector
-
-
-class AudioStreamWorker(QThread):
-    update_decibels = pyqtSignal(float)
-
-    def __init__(self):
-        super().__init__()
-        self.running = True
-
-    def run(self):
-        p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paInt16,
-                        channels=1,
-                        rate=44100,
-                        input=True,
-                        frames_per_buffer=512)
-        while self.running:
-            data = stream.read(512, exception_on_overflow=False)
-            data_int = np.frombuffer(data, dtype=np.int16)
-            rms = np.sqrt(np.mean(np.square(data_int)))
-            decibels = 20 * np.log10(rms) if rms > 0 else -np.inf
-            self.update_decibels.emit(decibels)
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-
-    def stop(self):
-        self.running = False
-
-class AudioVisualiser(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.muted = False
-        self.decibels = 0
-        self.init_ui()
-        self.audio_thread = AudioStreamWorker()
-        self.audio_thread.update_decibels.connect(self.update_decibels)
-        self.audio_thread.start()
-
-    def init_ui(self):
-        self.setFixedSize(600, 100)
-        self.setStyleSheet("background-color: black;")
-
-    def update_decibels(self, decibels):
-        if not self.muted:
-            self.decibels = decibels
-        self.repaint()
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.fillRect(self.rect(), Qt.black)
-        if self.muted:
-            painter.setPen(QColor(255, 0, 0))
-            painter.drawLine(self.rect().topLeft(), self.rect().bottomRight())
-        else:
-            painter.setPen(Qt.green)
-            height = self.rect().height()
-            width = self.rect().width()
-
-            # Ensure decibels are non-negative for visualization purposes
-            adjusted_decibels = max(self.decibels, 0)
-            line_height = int((adjusted_decibels / 100) * height)
-            painter.drawLine(0, height - line_height, width, height - line_height)
-
-    def toggle_mute(self, event):
-        self.muted = not self.muted
-        self.repaint()
-
-    def closeEvent(self, event):
-        self.audio_thread.stop()
-        self.audio_thread.wait()
-        event.accept()
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QHBoxLayout
+from PyQt5.QtCore import QTimer, Qt
+from monitor_selector import MonitorSelector
+from audio_visualiser import AudioVisualiser
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -178,10 +103,3 @@ class MainWindow(QMainWindow):
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-    sys.exit(app.exec_())
