@@ -128,6 +128,7 @@ class MainWindow(QMainWindow):
                 # Call backend function with JPEG data
                 #self.send_to_backend(jpeg_data)
                 
+                
     def clear_layout(self, layout):
         while layout.count():
             child = layout.takeAt(0)

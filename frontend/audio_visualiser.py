@@ -50,10 +50,12 @@ class AudioVisualiser(QWidget):
 
             # Draw the frequency bars
             num_bars = len(fft_magnitude)
-            bar_width = width / num_bars
-            for i in range(num_bars):
-                bar_height = fft_magnitude[i] * height
-                painter.drawLine(int(i * bar_width), height, int(i * bar_width), height - int(bar_height))
+            if num_bars > 0:
+                bar_width = width / num_bars
+                for i in range(num_bars):
+                    bar_height = fft_magnitude[i] * height
+                    x = int(i * bar_width)
+                    painter.drawLine(x, height, x, height - int(bar_height))
 
     def toggle_mute(self, event):
         self.muted = not self.muted
