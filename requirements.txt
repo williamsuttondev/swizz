@@ -1,6 +1,6 @@
 1. microphone input for front end - mute and screen grabbing
 2. wake word / voice to speech
 3. code prompt sending
-5. video stream to screenshots for gpt api
-6. markdown formatting for response return
-7. code prompt/prompt editing box
+4. video stream to screenshots for gpt api
+5. markdown formatting for response return
+6. code prompt/prompt editing box
