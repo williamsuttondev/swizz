@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButt
 from PyQt5.QtCore import QTimer, Qt
 from monitor_selector import MonitorSelector
 from audio_visualiser import AudioVisualiser
+from output_window import OutputWindow
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,6 +15,7 @@ class MainWindow(QMainWindow):
         self.selected_monitor = None
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_live_preview)
+        self.output_window = None
 
     def init_ui(self):
         self.setWindowTitle("swizz")
@@ -72,6 +75,10 @@ class MainWindow(QMainWindow):
         self.audio_visualiser.mousePressEvent = self.audio_visualiser.toggle_mute
         self.layout.addWidget(self.audio_visualiser)
 
+        # Open the output window
+        self.output_window = OutputWindow()
+        self.output_window.show()
+
     def start_swizz_without_video(self):
         # Stop live preview updates
         self.timer.stop()
@@ -84,6 +91,10 @@ class MainWindow(QMainWindow):
         self.audio_visualiser.setFixedSize(600, 100)
         self.audio_visualiser.mousePressEvent = self.audio_visualiser.toggle_mute
         self.layout.addWidget(self.audio_visualiser)
+
+        # Open the output window
+        self.output_window = OutputWindow()
+        self.output_window.show()
 
     def update_live_preview(self):
         if self.selected_monitor:
