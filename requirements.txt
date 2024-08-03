@@ -3,4 +3,4 @@
 3. code prompt sending
 4. video stream to screenshots for gpt api
 5. markdown formatting for response return
-6. code prompt/prompt editing box/
+6. code prompt/prompt editing box
