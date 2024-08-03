@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.monitor_selector)
 
         # Monitor Preview Placeholder
-        self.monitor_preview = QLabel("Monitor Preview", self)
+        self.monitor_preview = QLabel("Please select a monitor preview", self)
         self.monitor_preview.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.monitor_preview)
 
