@@ -6,4 +6,4 @@ import os
 with open("requirements.txt") as file:
     
     for line in file.readlines():
-        print(line)
+        os.system(f"pacman -S python-{line}")
