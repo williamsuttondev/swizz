@@ -39,7 +39,7 @@ class Communicator:
 
             Initialises the API key and the openAI client respectively to allow for communications between the user and the openAI model
 
-            :cls start_date: Reference to the Communicator class, weird way of allowing python to modify static variables but here we are. 
+            :cls: Reference to the Communicator class, weird way of allowing python to modify static variables but here we are. 
         """
 
         try:
@@ -48,6 +48,17 @@ class Communicator:
         except (AuthenticationError, FileNotFoundError) as e:
             cls.__Error = e
 
+    @classmethod
+    def clearConversation(cls):
+        """
+            @author     : Brandon Wright - Barnold8
+
+            Clears the conversation by resetting Communicator.__conversation to an empty string
+
+            :cls: Reference to the Communicator class, weird way of allowing python to modify static variables but here we are. 
+        """
+        cls.__conversation = ""
+        
 
     async def __chunkConcatenation(stream: AsyncIterable) -> str:
         """
