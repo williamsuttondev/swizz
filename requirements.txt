@@ -2,3 +2,4 @@ mss
 PyQt5
 numpy
 pyaudio
+openai

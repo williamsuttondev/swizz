@@ -1,5 +1,4 @@
-
-
+from openAI import openAI
 
 class Communicator:
 
