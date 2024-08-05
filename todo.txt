@@ -1,0 +1,6 @@
+1. microphone input for front end - mute and screen grabbing w
+2. wake word / voice to speech h
+3. code prompt sending b
+4. video stream to screenshots for gpt api b
+5. markdown formatting for response return w
+6. code prompt/prompt editing box w
