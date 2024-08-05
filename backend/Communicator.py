@@ -60,7 +60,7 @@ class Communicator:
         cls.__conversation = ""
         
 
-    async def __chunkConcatenation(stream: AsyncIterable) -> str:
+    async def __chunkConcatenation(stream) -> str:
         """
             @author    : Brandon Wright - Barnold8
 
@@ -137,3 +137,6 @@ class Communicator:
         }
 
         return response
+
+
+Communicator.initialise_client()
